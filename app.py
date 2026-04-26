@@ -8,16 +8,10 @@ from models.youtubeapi import YouTubeAPI
 
 app = Flask(__name__)
 
-# -----------------------------
-# CONFIG
-# -----------------------------
 UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# -----------------------------
-# LOAD JSON (FIXED PATH)
-# -----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(BASE_DIR, "recipes.json")
 
