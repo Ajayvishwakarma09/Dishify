@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Dishify - Smart Recipe Generator</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+font-family:Arial;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.main-card{
+background:white;
+padding:45px;
+border-radius:25px;
+max-width:650px;
+width:100%;
+box-shadow:0 15px 40px rgba(0,0,0,0.25);
+}
+
+.logo{
+color:#e63946;
+font-size:50px;
+}
+
+.title{
+font-weight:bold;
+font-size:38px;
+color:#1d3557;
+}
+
+.subtitle{
+color:#555;
+margin-bottom:25px;
+}
+
+.search-box{
+border-radius:15px;
+padding:14px;
+font-size:16px;
+}
+
+#suggestions{
+position:absolute;
+background:white;
+width:100%;
+border-radius:10px;
+border:1px solid #ddd;
+z-index:999;
+}
+
+.suggestion-item{
+padding:10px;
+cursor:pointer;
+}
+
+.suggestion-item:hover{
+background:#f5f5f5;
+}
+
+.upload-box{
+border:2px dashed #ccc;
+padding:35px;
+border-radius:20px;
+text-align:center;
+margin-top:20px;
+}
+
+.upload-box i{
+color:#e63946;
+}
+
+.serving-box{
+background:#f7f7f7;
+border-radius:15px;
+padding:20px;
+margin-top:20px;
+}
+
+.serv-btn{
+width:40px;
+height:40px;
+border:none;
+border-radius:50%;
+background:#f1f1f1;
+font-size:18px;
+}
+
+.generate-btn{
+background:linear-gradient(90deg,#e63946,#f4a261);
+border:none;
+padding:14px;
+border-radius:12px;
+width:100%;
+color:white;
+font-size:18px;
+margin-top:25px;
+}
+
+.generate-btn:hover{
+opacity:0.9;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main-card text-center">
+
+<i class="fa-solid fa-utensils logo"></i>
+
+<h1 class="title">Dishify</h1>
+
+<p class="subtitle">
+Smart Recipe Generator
+</p>
+
+<form method="POST" enctype="multipart/form-data">
+
+<div class="position-relative">
+
+<input
+type="text"
+name="dish_name"
+id="dishInput"
+class="form-control search-box"
+placeholder="Search pizza, biryani, pasta..."
+autocomplete="off"
+onkeyup="suggestDish()">
+
+<div id="suggestions"></div>
+
+</div>
+
+<div class="upload-box mt-3">
+
+<i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
+
+<p class="mt-2">
+Upload Food Image
+</p>
+
+<input type="file" name="image" class="form-control">
+
+</div>
+
+<div class="serving-box mt-3">
+
+<p><i class="fa-solid fa-users"></i> Number of Servings</p>
+
+<div class="d-flex justify-content-center gap-3">
+
+<button type="button" class="serv-btn" onclick="changeServ(-1)">-</button>
+
+<input
+type="number"
+name="people"
+id="people"
+value="1"
+min="1"
+class="form-control"
+style="width:80px;text-align:center">
+
+<button type="button" class="serv-btn" onclick="changeServ(1)">+</button>
+
+</div>
+
+</div>
+
+<button class="generate-btn">
+
+<i class="fa-solid fa-wand-magic-sparkles"></i>
+Generate Recipe →
+
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+function changeServ(v){
+
+let p=document.getElementById("people")
+
+let val=parseInt(p.value)+v
+
+if(val<1) val=1
+
+p.value=val
+
+}
+
+function suggestDish(){
+
+let query=document.getElementById("dishInput").value
+
+if(query.length<1){
+
+document.getElementById("suggestions").innerHTML=""
+
+return
+
+}
+
+fetch("/suggest?q="+query)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let html=""
+
+data.suggestions.forEach(item=>{
+
+html+=`<div class="suggestion-item"
+onclick="selectDish('${item}')">${item}</div>`
+
+})
+
+document.getElementById("suggestions").innerHTML=html
+
+})
+
+}
+
+function selectDish(name){
+
+document.getElementById("dishInput").value=name
+
+document.getElementById("suggestions").innerHTML=""
+
+}
+
+</script>
+
+</body>
+</html>
