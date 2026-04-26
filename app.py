@@ -3,7 +3,6 @@ import os
 import json
 import re
 
-from models.vision_model import FoodVisionModel
 from models.youtubeapi import YouTubeAPI
 
 app = Flask(__name__)
@@ -20,22 +19,10 @@ with open(json_path, "r", encoding="utf-8") as f:
 
 recipes = data["recipes"]
 
-# -----------------------------
-# MODELS
-# -----------------------------
-vision_model = FoodVisionModel()
-
-# ❌ REMOVE HARDCODED KEY
-# YOUTUBE_KEY = "AIzaSy..."
-
-# ✅ USE ENV VARIABLE
 YOUTUBE_KEY = os.getenv("YOUTUBE_API_KEY")
-
 youtube_api = YouTubeAPI(YOUTUBE_KEY)
 
-# -----------------------------
-# FUNCTIONS
-# -----------------------------
+
 def find_recipe(dish_name):
     if not dish_name:
         return None
@@ -73,9 +60,6 @@ def scale_ingredients(recipe, people):
     return scaled
 
 
-# -----------------------------
-# MAIN ROUTE
-# -----------------------------
 @app.route("/", methods=["GET", "POST"])
 def index():
 
@@ -89,11 +73,9 @@ def index():
         image_path = None
         dish = None
 
-        # CASE 1 → Manual search
         if dish_name and dish_name.strip() != "":
             dish = dish_name.strip()
 
-        # CASE 2 → Image upload
         elif image and image.filename != "":
 
             filename = image.filename.lower()
@@ -110,9 +92,8 @@ def index():
             if recipe:
                 dish = recipe["name"]
             else:
-                dish = vision_model.predict_dish(image_path)
+                dish = clean_name
 
-        # fallback
         if not dish:
             dish = "food"
 
@@ -159,9 +140,6 @@ def index():
     return render_template("index.html")
 
 
-# -----------------------------
-# AUTO SUGGEST
-# -----------------------------
 @app.route("/suggest")
 def suggest():
 
@@ -180,8 +158,5 @@ def suggest():
     return jsonify({"suggestions": suggestions})
 
 
-# -----------------------------
-# RUN APP
-# -----------------------------
 if __name__ == "__main__":
     app.run(debug=True)

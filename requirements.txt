@@ -2,4 +2,3 @@ Flask
 gunicorn
 google-api-python-client
 python-dotenv
-transformers
